@@ -9,9 +9,9 @@ export const formatDate = (dateStr) => {
     return `${parseInt(day)} ${monthUpperCase.substr(0,3)}. ${year.toString().substr(2,4)}`
     // 17 Jui. 21
   } else {
-    console.log('---')
+/*    console.log('---')
     console.log(dateStr)
-    console.log('---')
+    console.log('---')*/
 
     return ''
   }
