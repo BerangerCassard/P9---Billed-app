@@ -15,20 +15,48 @@ export default class NewBill {
     this.fileName = null
     new Logout({ document, localStorage, onNavigate })
   }
+
+  alertExtension = e => {
+    window.alert('Choose a jpg, jpeg, or png format')
+  }
+
   handleChangeFile = e => {
+
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
+
+    const extensionIndex = file.name.lastIndexOf('.')
+    const slicedFileName = file.name.slice(extensionIndex+1)
+    const acceptedExtensions = ['jpeg','jpg','png']
+
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length-1]
-    this.firestore
-      .storage
-      .ref(`justificatifs/${fileName}`)
-      .put(file)
-      .then(snapshot => snapshot.ref.getDownloadURL())
-      .then(url => {
-        this.fileUrl = url
-        this.fileName = fileName
-      })
+
+    if(acceptedExtensions.includes(slicedFileName)) {
+      if(filePath) {
+        this.handleChangeFileBis(file, fileName)
+      }
+    } else {
+      this.alertExtension()
+      this.document.querySelector(`input[data-testid="file"]`).value = "";
+    }
   }
+
+  handleChangeFileBis = (file, fileName) => {
+    if(this.firestore) {
+      this.firestore
+          .storage
+          .ref(`justificatifs/${fileName}`)
+          .put(file)
+          .then(snapshot => snapshot.ref.getDownloadURL())
+          .then(url => {
+            this.fileUrl = url
+            this.fileName = fileName
+          })
+          .catch(error => error)
+    }
+
+  }
+
   handleSubmit = e => {
     e.preventDefault()
     console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
