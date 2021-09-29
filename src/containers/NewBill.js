@@ -23,11 +23,10 @@ export default class NewBill {
   handleChangeFile = e => {
 
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
-
+    console.log(file)
     const extensionIndex = file.name.lastIndexOf('.')
     const slicedFileName = file.name.slice(extensionIndex+1)
     const acceptedExtensions = ['jpeg','jpg','png']
-
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length-1]
 
