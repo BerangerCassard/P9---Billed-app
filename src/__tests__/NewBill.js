@@ -6,6 +6,7 @@ import userEvent from "@testing-library/user-event";
 import {localStorageMock} from "../__mocks__/localStorage";
 import firebase from "../__mocks__/firebase";
 import DashboardUI from "../views/DashboardUI";
+import BillsUI from "../views/BillsUI";
 
 jest.mock("../app/Firestore");
 
@@ -16,9 +17,14 @@ describe("Given I am connected as an employee", () => {
     describe("When i choose a file to upload", () => {
       const html = NewBillUI()
       document.body.innerHTML = html
-      const onNavigate = (pathname) => {
-        document.body.innerHTML = ROUTES({pathname})
-      }
+      jest.spyOn(window, 'alert').mockImplementation(() => {});
+      const onNavigate = (pathname) => {document.body.innerHTML = ROUTES({ pathname });}
+      Object.defineProperty(window, "localStorage", {value: localStorageMock,})
+      window.localStorage.setItem(
+          "user",
+          JSON.stringify({
+            type: "Employee",
+          }))
       let firestore = null
       const newBill = new NewBill({ document, onNavigate, firestore, localStorage: window.localStorage })
       const input = screen.getByTestId('file')
@@ -40,7 +46,9 @@ describe("Given I am connected as an employee", () => {
         fireEvent.change(input, {target: {files: [file]}})
         await handleChangeFile
         expect(handleChangeFile).toHaveBeenCalled()
+        expect(input.files[0]).toStrictEqual(file)
         expect(input.value).toBe('')
+        expect(window.alert).toHaveBeenCalled()
       })
     })
     describe('When i click on the submit button with the right input', () => {
@@ -86,25 +94,52 @@ describe("Given I am connected as an employee", () => {
         Object.defineProperty(window, 'localStorage', { value: localStorageMock})
         window.localStorage.setItem('user', JSON.stringify({
           type: 'Employee',
-          email: 'johndoe@email.com'
         }))
 
         const onNavigate = (pathname) => {
           document.body.innerHTML = ROUTES({pathname})
         }
 
-        const PREVIOUS_LOCATION = ''
-
         const firestore = null
         const newBill = new NewBill({ document, onNavigate, firestore, localStorage: window.localStorage })
 
         const handleSubmit = jest.fn(newBill.handleSubmit)
         submitNewBill.addEventListener('submit', handleSubmit)
-
         fireEvent.submit(submitNewBill)
         expect(handleSubmit).toHaveBeenCalled()
         expect(screen.getAllByText('Mes notes de frais')).toBeTruthy()
       })
+    })
+  })
+  describe("When I am on NewBill Page and I submit the form", () => {
+
+    test("the file should be loaded and handle", () => {
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname })
+      };
+      Object.defineProperty(window, "localStorage", {
+        value: localStorageMock,
+      });
+      window.localStorage.setItem(
+          "user",
+          JSON.stringify({
+            type: "Employee",
+          })
+      );
+      const firestore = null;
+      const html = NewBillUI();
+      document.body.innerHTML = html
+      const newBill = new NewBill({
+        document,
+        onNavigate,
+        firestore,
+        localStorage: window.localStorage,
+      });
+      const handleSubmit = jest.fn(newBill.handleSubmit);
+      const submitBtn = screen.getByTestId("form-new-bill");
+      submitBtn.addEventListener("submit", handleSubmit);
+      fireEvent.submit(submitBtn);
+      expect(handleSubmit).toHaveBeenCalled();
     })
   })
 })

@@ -40,6 +40,7 @@ export default class NewBill {
     }
   }
 
+  /* istanbul ignore next */
   handleChangeFileBis = (file, fileName) => {
     if(this.firestore) {
       this.firestore
@@ -78,6 +79,8 @@ export default class NewBill {
   }
 
   // not need to cover this function by tests
+
+  /* istanbul ignore next */
   createBill = (bill) => {
     if (this.firestore) {
       this.firestore
