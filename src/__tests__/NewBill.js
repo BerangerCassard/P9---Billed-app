@@ -10,15 +10,18 @@ import BillsUI from "../views/BillsUI";
 
 jest.mock("../app/Firestore");
 
-describe("Given I am connected as an employee", () => {
+describe("Etant donné que je suis connecté comme employé", () => {
 
-  describe("When I am on NewBill Page", () => {
+  describe("Quand je suis sur la page NewBill", () => {
 
-    describe("When i choose a file to upload", () => {
+    describe("Et que je choisis un fichier à charger", () => {
+
       const html = NewBillUI()
       document.body.innerHTML = html
       jest.spyOn(window, 'alert').mockImplementation(() => {});
-      const onNavigate = (pathname) => {document.body.innerHTML = ROUTES({ pathname });}
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname })
+      }
       Object.defineProperty(window, "localStorage", {value: localStorageMock,})
       window.localStorage.setItem(
           "user",
@@ -26,14 +29,24 @@ describe("Given I am connected as an employee", () => {
             type: "Employee",
           }))
       let firestore = null
-      const newBill = new NewBill({ document, onNavigate, firestore, localStorage: window.localStorage })
+      const newBill = new NewBill({
+        document,
+        onNavigate,
+        firestore,
+        localStorage: window.localStorage
+      })
       const input = screen.getByTestId('file')
       const handleChangeFile = jest.fn(newBill.handleChangeFile)
       input.addEventListener('change', handleChangeFile)
       const falseAlert = jest.fn(newBill.alertExtension)
 
-      it('should be loaded and handled, if it is in a correct format', async () => {
-        const file = new File(['test file'], 'testFile.jpg', {type: 'image/jpg'})
+      it("il devrait être conservé après chargement, si le format est correct", async () => {
+
+        const file = new File(
+            ['test file'],
+            'testFile.jpg',
+            {type: 'image/jpg'}
+        )
         fireEvent.change(input, {target: {files: [file]}})
         await handleChangeFile
         expect(handleChangeFile).toHaveBeenCalled()
@@ -41,7 +54,8 @@ describe("Given I am connected as an employee", () => {
         expect(falseAlert).not.toHaveBeenCalled()
       })
 
-      it('should not be loaded and should alert, if it is in a incorrect format', async () => {
+      it("il ne devrait pas être conservé après chargement et déclencher une alerte, si le format est incorrect", async () => {
+
         const file = new File(['test file'], 'testFile.txt', {type:'text/txt'})
         fireEvent.change(input, {target: {files: [file]}})
         await handleChangeFile
@@ -51,8 +65,11 @@ describe("Given I am connected as an employee", () => {
         expect(window.alert).toHaveBeenCalled()
       })
     })
-    describe('When i click on the submit button with the right input', () => {
-      it('should submit my new bill and go back to bills page', () => {
+
+    describe("Quand je clique sur le bouton Submit avec le bon input", () => {
+
+      it("ma nouvelle Bill devrait etre soumise et je reviens à la page Bills", () => {
+
         const html = NewBillUI()
         document.body.innerHTML = html
         const inputData = {
@@ -99,10 +116,13 @@ describe("Given I am connected as an employee", () => {
         const onNavigate = (pathname) => {
           document.body.innerHTML = ROUTES({pathname})
         }
-
         const firestore = null
-        const newBill = new NewBill({ document, onNavigate, firestore, localStorage: window.localStorage })
-
+        const newBill = new NewBill({
+          document,
+          onNavigate,
+          firestore,
+          localStorage: window.localStorage
+        })
         const handleSubmit = jest.fn(newBill.handleSubmit)
         submitNewBill.addEventListener('submit', handleSubmit)
         fireEvent.submit(submitNewBill)
@@ -111,45 +131,15 @@ describe("Given I am connected as an employee", () => {
       })
     })
   })
-  describe("When I am on NewBill Page and I submit the form", () => {
-
-    test("the file should be loaded and handle", () => {
-      const onNavigate = (pathname) => {
-        document.body.innerHTML = ROUTES({ pathname })
-      };
-      Object.defineProperty(window, "localStorage", {
-        value: localStorageMock,
-      });
-      window.localStorage.setItem(
-          "user",
-          JSON.stringify({
-            type: "Employee",
-          })
-      );
-      const firestore = null;
-      const html = NewBillUI();
-      document.body.innerHTML = html
-      const newBill = new NewBill({
-        document,
-        onNavigate,
-        firestore,
-        localStorage: window.localStorage,
-      });
-      const handleSubmit = jest.fn(newBill.handleSubmit);
-      const submitBtn = screen.getByTestId("form-new-bill");
-      submitBtn.addEventListener("submit", handleSubmit);
-      fireEvent.submit(submitBtn);
-      expect(handleSubmit).toHaveBeenCalled();
-    })
-  })
 })
 
   //POST integration test
-  describe("Given I am a user connected as Employee", () => {
+  describe("Etant donné que je suis connecté comme Employé", () => {
 
-    describe("When I create a new bill", () => {
+    describe("Lorsque je crée une nouvelle Bill", () => {
 
       test("Add bill to mock API POST", async () => {
+
         const getSpyPost = jest.spyOn(firebase, "post")
         const newBill = {
           id: "eoKIpYhECmaZAGRrHjaC",
@@ -172,6 +162,7 @@ describe("Given I am connected as an employee", () => {
       });
 
       test("Add bill to API and fails with 404 message error", async () => {
+
         firebase.post.mockImplementationOnce(() =>
             Promise.reject(new Error("Erreur 404"))
         );
@@ -182,6 +173,7 @@ describe("Given I am connected as an employee", () => {
       });
 
       test("Add bill to API and fails with 500 message error", async () => {
+
         firebase.post.mockImplementationOnce(() =>
             Promise.reject(new Error("Erreur 404"))
         );

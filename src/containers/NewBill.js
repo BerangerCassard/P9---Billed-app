@@ -31,6 +31,7 @@ export default class NewBill {
     const fileName = filePath[filePath.length-1]
 
     if(acceptedExtensions.includes(slicedFileName)) {
+      /* istanbul ignore next */
       if(filePath) {
         this.handleChangeFileBis(file, fileName)
       }
@@ -78,7 +79,6 @@ export default class NewBill {
     this.onNavigate(ROUTES_PATH['Bills'])
   }
 
-  // not need to cover this function by tests
 
   /* istanbul ignore next */
   createBill = (bill) => {
